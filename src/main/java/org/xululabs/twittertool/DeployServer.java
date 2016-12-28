@@ -59,6 +59,7 @@ public class DeployServer extends AbstractVerticle {
 		router.route(HttpMethod.POST, "/searchProfiles").blockingHandler(this::searchProfiles);
 		router.route(HttpMethod.POST, "/searchInTweetsAndProfiles").blockingHandler(this::searchInTweetsAndProfiles);
 		router.route(HttpMethod.POST, "/retweet").blockingHandler(this::retweetRoute);
+		router.route(HttpMethod.POST, "/follow").blockingHandler(this::followRoute);
 
 	}
 
@@ -156,6 +157,27 @@ public class DeployServer extends AbstractVerticle {
 			HashMap<String, String> credentials = mapper.readValue(credentialsJson, credentialsType);
 			boolean retweeted = twitter4jApi.retweet(this.getTwitterInstance(credentials.get("consumerKey"), credentials.get("consumerSecret"), credentials.get("accessToken"), credentials.get("accessTokenSecret")), Long.parseLong(tweetId));
 	        responseMap.put("retweeted", retweeted);
+	        response = mapper.writeValueAsString(responseMap);
+	    }catch(Exception ex){
+	    	response = "{\"status\" : \"error\", \"msg\" :" + ex.getMessage() + "}";
+	    }
+	    routingContext.response().end(response);
+	}
+	/**
+	 * use to follow user
+	 * @param routingContext
+	 */
+	public void followRoute(RoutingContext routingContext){
+		ObjectMapper mapper = new ObjectMapper();
+		HashMap<String, Object> responseMap = new HashMap<String, Object>();
+		String response;
+		String screenName = (routingContext.request().getParam("screenName") == null) ? "" : routingContext.request().getParam("screenName");
+		String credentialsJson = (routingContext.request().getParam("credentials") == null) ? "": routingContext.request().getParam("credentials");
+	    try{
+	    	TypeReference<HashMap<String, Object>> credentialsType = new TypeReference<HashMap<String, Object>>() {};
+			HashMap<String, String> credentials = mapper.readValue(credentialsJson, credentialsType);
+		     twitter4jApi.followUser(this.getTwitterInstance(credentials.get("consumerKey"), credentials.get("consumerSecret"), credentials.get("accessToken"), credentials.get("accessTokenSecret")), screenName);
+	        responseMap.put("status", "follow");
 	        response = mapper.writeValueAsString(responseMap);
 	    }catch(Exception ex){
 	    	response = "{\"status\" : \"error\", \"msg\" :" + ex.getMessage() + "}";

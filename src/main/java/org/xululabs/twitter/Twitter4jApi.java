@@ -26,9 +26,10 @@ public class Twitter4jApi {
 	 * @return twitter
 	 */
 
-	public Twitter getTwitterInstance(String consumerKey, String consumerSecret, String accessToken, String accessTokenSecret) {
+	public Twitter getTwitterInstance(String consumerKey, String consumerSecret, String accessToken,
+			String accessTokenSecret) {
 
-		Twitter twitter = null;		
+		Twitter twitter = null;
 		ConfigurationBuilder cb = new ConfigurationBuilder();
 		cb.setDebugEnabled(true).setOAuthConsumerKey(consumerKey).setOAuthConsumerSecret(consumerSecret)
 				.setOAuthAccessToken(accessToken).setOAuthAccessTokenSecret(accessTokenSecret);
@@ -36,13 +37,15 @@ public class Twitter4jApi {
 		twitter = tf.getInstance();
 		return twitter;
 	}
-  /**
-   * search keyword
-   * @param twitter
-   * @param keyword
-   * @return tweets
-   * @throws Exception
-   */
+
+	/**
+	 * search keyword
+	 * 
+	 * @param twitter
+	 * @param keyword
+	 * @return tweets
+	 * @throws Exception
+	 */
 	public ArrayList<Map<String, Object>> getTweets(Twitter twitter, String searchQuery) throws Exception {
 		ArrayList<Map<String, Object>> tweets = new ArrayList<Map<String, Object>>();
 		Query query = new Query(searchQuery);
@@ -64,17 +67,19 @@ public class Twitter4jApi {
 		}
 		return tweets;
 	}
+
 	/**
 	 * use to get users by searching in their profile
+	 * 
 	 * @param twitter
 	 * @param searchTerm
 	 * @return
 	 * @throws TwitterException
 	 */
-	public ArrayList<Map<String, Object>> getUsersProfiles(Twitter twitter, String searchTerm) throws TwitterException{
+	public ArrayList<Map<String, Object>> getUsersProfiles(Twitter twitter, String searchTerm) throws TwitterException {
 		ArrayList<Map<String, Object>> usersList = new ArrayList<Map<String, Object>>();
 		ResponseList<User> users = twitter.searchUsers(searchTerm, 1);
-		for(User user : users){
+		for (User user : users) {
 			Map<String, Object> userInfo = new HashMap<String, Object>();
 			userInfo.put("name", user.getName());
 			userInfo.put("screenName", user.getScreenName());
@@ -84,9 +89,21 @@ public class Twitter4jApi {
 		}
 		return usersList;
 	}
-	
-	public boolean retweet(Twitter twitter, long tweetId) throws TwitterException{
+
+	/**
+	 * use to retweet tweet
+	 * 
+	 * @param twitter
+	 * @param tweetId
+	 * @return
+	 * @throws TwitterException
+	 */
+	public boolean retweet(Twitter twitter, long tweetId) throws TwitterException {
 		Status retweeted = twitter.retweetStatus(tweetId);
 		return true;
+	}
+
+	public void followUser(Twitter twitter, String screenName) throws TwitterException {
+		twitter.createFriendship(screenName);
 	}
 }
